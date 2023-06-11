@@ -140,7 +140,6 @@ export const updateRecipe = async (req: Request, res: Response) => {
 
 export const deleteRecipe = async (req: Request, res: Response) => {
   const { id } = req.params;
-  // const db = client.db();
   try {
     const thisRecipe = await Recipe.findById(id);
     if (!thisRecipe) {
@@ -162,7 +161,6 @@ export const getRecipesBySearch = async (req: Request, res: Response) => {
     const recipes = await Recipe.find({
       title: { $regex: searchQuery, $options: "i" },
     });
-    console.log(recipes);
     return res.status(200).json(recipes);
   } catch (error) {
     console.log(error);
