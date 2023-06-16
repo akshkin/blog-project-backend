@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { Recipe } from "../models/Recipe.model";
-import PDFDocument from "pdfkit";
-import path from "path";
-import fs from "fs";
 
 export const getAllRecipes = async (req: Request, res: Response) => {
   try {
@@ -28,7 +25,8 @@ export const getRecipeById = async (req: Request, res: Response) => {
 };
 
 export const createRecipe = async (req: Request, res: Response) => {
-  const { title, description, image, date, ingredients, method } = req.body;
+  const { title, description, image, date, ingredients, method } =
+    req.body.post;
 
   if (
     !title ||
@@ -61,34 +59,24 @@ export const createRecipe = async (req: Request, res: Response) => {
       ingredients,
       method,
     });
-    console.log(newRecipe);
+
     return res.status(201).json({ message: "Recipe created." });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Failed to connect to database" });
+    return res.status(500).json({ error: "Failed to connect to database" });
   }
 };
 
 export const updateRecipe = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { title, description, image, date, ingredients, method } = req.body;
+  const { title, description, image, date, ingredients, method } =
+    req.body.post;
+
   try {
     const thisRecipe = await Recipe.findById({ _id: id });
     if (!thisRecipe) {
       return res.status(404).json({ error: "No recipe found" });
     }
-    // const updatedFields = {
-    //   title: "",
-    //   description: "",
-    //   image: "",
-    //   date: "",
-    //   ingredients: [],
-    //   method: []
-    // };
-
-    // updates.forEach((update) => {
-    //   updatedFields[update] = req.body[update];
-    // });
 
     if (
       !title ||
@@ -102,8 +90,9 @@ export const updateRecipe = async (req: Request, res: Response) => {
     ) {
       return res.status(422).json({ error: "All fields are required" });
     }
+
     const postWithSameTitle = await Recipe.findOne({
-      _id: !thisRecipe._id,
+      _id: { $ne: thisRecipe._id },
       title: title,
     });
 
@@ -123,14 +112,6 @@ export const updateRecipe = async (req: Request, res: Response) => {
     });
     console.log(updatedPost);
 
-    // const { title, description, date, ingredients, method} = updatedFields
-
-    // await db
-    //   .collection("recipes")
-    //   .updateOne(
-    //     { title },
-    //     { $set: { ...updatedFields, _id: thisRecipe._id } }
-    //   );
     return res.status(200).json({ message: "Successfully updated recipe!" });
   } catch (error) {
     console.log(error);
@@ -151,7 +132,7 @@ export const deleteRecipe = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Successfully deleted recipe!" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Could not delete recipe." });
+    res.status(500).json({ error: "Could not delete recipe." });
   }
 };
 

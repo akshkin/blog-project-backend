@@ -8,15 +8,15 @@ import {
   updateRecipe,
 } from "../controllers/Recipe.controller";
 import { adminAuth } from "../middleware/adminAuth";
-import { Clerk, ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
+import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
 
 const recipeRouter = express.Router();
 
 recipeRouter.get("/", getAllRecipes);
 recipeRouter.get("/:title", getRecipeById);
-recipeRouter.post("/", ClerkExpressWithAuth(), createRecipe);
-recipeRouter.patch("/", ClerkExpressWithAuth(), updateRecipe);
-recipeRouter.delete("/", ClerkExpressWithAuth(), deleteRecipe);
+recipeRouter.post("/", ClerkExpressWithAuth(), adminAuth, createRecipe);
+recipeRouter.patch("/:id", ClerkExpressWithAuth(), adminAuth, updateRecipe);
+recipeRouter.delete("/:id", ClerkExpressWithAuth(), adminAuth, deleteRecipe);
 recipeRouter.get("/search/:searchQuery", getRecipesBySearch);
 
 export { recipeRouter };

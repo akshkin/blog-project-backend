@@ -1,18 +1,13 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import bodyParser from "body-parser";
 import { LooseAuthProp } from "@clerk/clerk-sdk-node";
 
 import { router } from "./routes";
 import { corsOptions } from "./corsOptions/corsOptions";
-import clerk, { createClerkClient } from "@clerk/clerk-sdk-node";
 
-const clerkCLient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
-
-dotenv.config({ path: __dirname + "/.env.local" });
 const app = express();
 const port = process.env.PORT;
 
@@ -24,6 +19,7 @@ declare global {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(router);
 
 app.get("/", (req, res) => {
